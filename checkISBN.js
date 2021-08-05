@@ -3,6 +3,13 @@ const imageDownloader = require('node-image-downloader')
 
 var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
 
+/**
+ *  Passando a lista de ISBN para um objeto"
+ * 
+ * @method passInputIsbnInObj
+ * @param {Array} array Sera convertido em objeto
+ * @returns {Objeto} Array convertido
+ */
 const passInputIsbnInObj = (array) => {
     let i = 0
     return array.reduce((acc ,val) => {
