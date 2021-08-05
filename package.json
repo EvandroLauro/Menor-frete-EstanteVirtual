@@ -1,0 +1,17 @@
+{
+  "name": "pagandomenos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "checkISBN.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "cheerio": "^1.0.0-rc.10",
+    "dns": "^0.2.2",
+    "node-image-downloader": "^1.0.7"
+  }
+}
