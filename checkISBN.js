@@ -1,18 +1,18 @@
 const {createRunScraping} = require('./createRunSCRAPING')
-const imageDownloader = require('node-image-downloader')
 
+//var inputIsbn = ['978-8573076103']
 var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
 
 /**
  *  Passando a lista de ISBN para um objeto"
  * 
  * @method passInputIsbnInObj
- * @param {Array} array Sera convertido em objeto
+ * @param {Array} isbns Sera convertido em objeto
  * @returns {Objeto} Array convertido
  */
-const passInputIsbnInObj = (array) => {
+const passInputIsbnInObj = (isbns) => { // Esse monte de return me incomoda, quero reduzir a um só, é possivel? Lembro de ter lido algo a respeito de numero de returns por funcao em algum lugar
     let i = 0
-    return array.reduce((acc ,val) => {
+    return isbns.reduce((acc ,val) => {
         const obj = {...acc , [i] : val};
         i++
         return obj;
@@ -22,18 +22,26 @@ const passInputIsbnInObj = (array) => {
 const checkIsbn = async(isbns) => {
     const run = await createRunScraping()
     const dataObtainedByScraping = await run.runScraping("https://amazon.com.br/s?k=", isbns)
-    const dataAnalyzed = analyzesDataObtainedByScraping(dataObtainedByScraping)
+    const dataAnalyzed = organizingDataForClassification(dataObtainedByScraping)
     return validatingIsbn(isbns, dataAnalyzed)
 }
 
-const analyzesDataObtainedByScraping = ($) => {
+/**
+ *  Organizando o html obtido pelo scraping para validação
+ * 
+ * @method organizingDataForClassification
+ * @param {Array} $ Sera organizado
+ * @returns {Array} Organizado
+ */
+const organizingDataForClassification = ($) => {
     let result = []
     for (let i = 0; i < $.length; i++) {
         $[i]('.s-no-outline').each((i, element) => {
             const link = $[i](element).attr("href")
-            result.push(link)
+            result.push(formatOrganizingDataForClassification(link))
+            
         })
-        $[i]('.a-size-medium').each((i, element) => {
+        $[i]('.a-size-medium').each((i, element) => { 
             const fail = $[i](element).text()
             if (fail == 'Nenhum resultado para ') {
                 result.push(fail)
@@ -43,8 +51,17 @@ const analyzesDataObtainedByScraping = ($) => {
     return result
 }
 
+const formatOrganizingDataForClassification = (link) => { // Esse monte de return me incomoda, quero reduzir a um só, é possivel? Lembro de ter lido algo a respeito de numero de returns por funcao em algum lugar
+    return link.split('/').filter((elem, index) => { 
+        if (index > 0 && index <= 3) {
+            return elem
+        }
+    }).map((elem) => {
+        return '/'.concat(elem)
+    }).toString().replace(/,/g, '')
+}
+
 const validatingIsbn = (chave, valor) => { 
-    console.log(valor)
     chave = Object.values(chave)
     let invalidos = {}, validos = {}
     for (let i = 0; i < valor.length; i++) { 
@@ -61,12 +78,15 @@ const validatingIsbn = (chave, valor) => {
         }
     }
     let result = Object.assign({invalido : invalidos}, {valido : validos})
+    console.log(result)
     return result
 }
 
 //checkIsbn(passInputIsbnInObj(inputIsbn))
 
 /*
+
+// Modulo que realmente sera consumido
 module.exports = {
     checkIsbn, 
 }
@@ -74,6 +94,6 @@ module.exports = {
 
 // Exportado para pagina de test
 module.exports = { 
-    passInputIsbnInObj
+    passInputIsbnInObj,
+    organizingDataForClassification
 }
-

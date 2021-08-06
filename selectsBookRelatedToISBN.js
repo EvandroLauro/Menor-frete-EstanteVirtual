@@ -20,7 +20,10 @@ const analyzesDataObtainedByScraping = () => {
     }
 
     // Esse codigo vai entrar aqui no meio
-    /* 
+    /*
+    const imageDownloader = require('node-image-downloader')
+                        V
+                        V
     for (let i = 0; i < $.length; i++) {
         $[i]('.s-image').each((i, element) => { // talvez a class seja diferente, verificar no html da pagina
             const link = $[i](element).attr("src") 
