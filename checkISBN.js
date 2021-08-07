@@ -10,7 +10,7 @@ var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
  * @param {Array} isbns Sera convertido em objeto
  * @returns {Objeto} Array convertido
  */
-const passInputIsbnInObj = (isbns) => { // Esse monte de return me incomoda, quero reduzir a um só, é possivel? Lembro de ter lido algo a respeito de numero de returns por funcao em algum lugar
+const passInputIsbnInObj = (isbns) => {
     let i = 0
     return isbns.reduce((acc ,val) => {
         const obj = {...acc , [i] : val};
@@ -51,7 +51,7 @@ const organizingDataForClassification = ($) => {
     return result
 }
 
-const formatOrganizingDataForClassification = (link) => { // Esse monte de return me incomoda, quero reduzir a um só, é possivel? Lembro de ter lido algo a respeito de numero de returns por funcao em algum lugar
+const formatOrganizingDataForClassification = (link) => { 
     return link.split('/').filter((elem, index) => { 
         if (index > 0 && index <= 3) {
             return elem
