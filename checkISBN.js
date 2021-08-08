@@ -12,10 +12,10 @@ var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
  */
 const passInputIsbnInObj = (isbns) => {
     let i = 0
-    return isbns.reduce((acc ,val) => {
-        const obj = {...acc , [i] : val};
+    return isbns.reduce((acc, val) => {
+        const obj = {...acc, [i] : val}
         i++
-        return obj;
+        return obj
     }, {})
 }
 
@@ -35,11 +35,10 @@ const checkIsbn = async(isbns) => {
  */
 const organizingDataForClassification = ($) => {
     let result = []
-    for (let i = 0; i < $.length; i++) {
+    for (i in $) {
+    
         $[i]('.s-no-outline').each((i, element) => {
-            const link = $[i](element).attr("href")
-            result.push(formatOrganizingDataForClassification(link))
-            
+            result.push(formatOrganizingDataForClassification($[i](element).attr("href")))
         })
         $[i]('.a-size-medium').each((i, element) => { 
             const fail = $[i](element).text()
@@ -50,15 +49,15 @@ const organizingDataForClassification = ($) => {
     }
     return result
 }
+    
+
 
 const formatOrganizingDataForClassification = (link) => { 
-    return link.split('/').filter((elem, index) => { 
-        if (index > 0 && index <= 3) {
-            return elem
-        }
-    }).map((elem) => {
-        return '/'.concat(elem)
-    }).toString().replace(/,/g, '')
+    return link.split('/')
+        .filter((elem, index) => index > 0 && index <= 3)
+        .map((elem) => '/'.concat(elem))
+        .toString()
+        .replace(/,/g, '')
 }
 
 const validatingIsbn = (chave, valor) => { 
