@@ -33,13 +33,20 @@ const checkIsbn = async(isbns) => {
  * @param {Array} $ Sera organizado
  * @returns {Array} Organizado
  */
-const organizingDataForClassification = ($) => { // aqui utilizamos condicional ternário           
+const organizingDataForClassification = ($) => { // função com condicional ternário           
     return $.map(elem => elem('.s-no-outline').length > 0 ? 
         formatOrganizingDataForClassification(elem('.s-no-outline').attr("href")) : 
         elem('.a-size-medium').text()
     )
 }
 
+/**
+ * Formatando o html organizado que sera validado
+ * 
+ * @method formatOrganizingDataForClassification
+ * @param {String} link Sera formatado 
+ * @returns {String} Formatado
+ */
 const formatOrganizingDataForClassification = (link) => { 
     return link.split('/')
         .filter((elem, index) => index > 0 && index <= 3)
@@ -80,7 +87,10 @@ module.exports = {
 */
 
 // Exportado para pagina de test
+
 module.exports = { 
     passInputIsbnInObj,
-    organizingDataForClassification
+    organizingDataForClassification,
+    formatOrganizingDataForClassification
+
 }
