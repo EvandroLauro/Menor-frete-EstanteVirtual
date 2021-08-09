@@ -33,24 +33,12 @@ const checkIsbn = async(isbns) => {
  * @param {Array} $ Sera organizado
  * @returns {Array} Organizado
  */
-const organizingDataForClassification = ($) => {
-    let result = []
-    for (i in $) {
-    
-        $[i]('.s-no-outline').each((i, element) => {
-            result.push(formatOrganizingDataForClassification($[i](element).attr("href")))
-        })
-        $[i]('.a-size-medium').each((i, element) => { 
-            const fail = $[i](element).text()
-            if (fail == 'Nenhum resultado para ') {
-                result.push(fail)
-            }
-        })
-    }
-    return result
+const organizingDataForClassification = ($) => { // aqui utilizamos condicional ternário           
+    return $.map(elem => elem('.s-no-outline').length > 0 ? 
+        formatOrganizingDataForClassification(elem('.s-no-outline').attr("href")) : 
+        elem('.a-size-medium').text()
+    )
 }
-    
-
 
 const formatOrganizingDataForClassification = (link) => { 
     return link.split('/')
