@@ -8,7 +8,7 @@ var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
  * 
  * @method passInputIsbnInObj
  * @param {Array} isbns Sera convertido em objeto
- * @returns {Objeto} Array convertido
+ * @returns {Object} Array convertido
  */
 const passInputIsbnInObj = (isbns) => {
     let i = 0
@@ -55,7 +55,15 @@ const formatOrganizingDataForClassification = (link) => {
         .replace(/,/g, '')
 }
 
-function validatingIsbn(isbns, links) {
+/**
+ * "Classifica os dados entre invalido e valido"
+ * 
+ * @method validatingIsbn
+ * @param {Object} isbns 
+ * @param {Array} links 
+ * @returns {Object}
+ */
+const validatingIsbn = (isbns, links) => {
     const valido = {}, invalido = {};
     let isbn = Object.values(isbns)
     for (let i = 0; i < links.length; i++) {
@@ -64,42 +72,6 @@ function validatingIsbn(isbns, links) {
     }
     return {invalido, valido}
 }
-/*
-const validatingIsbn = (isbns, links) => {
-    let invalidos = {}, validos = {}
-    return Object.values(isbns).reduce((obj, isbn, index) => {
-        let result 
-        if (links[index] == `Nenhum resultado para ${[isbn]}.`) {
-            let invalido = Object.assign(invalidos, {[isbn] : links[index]})
-            result = {...obj, invalido}
-        } else {
-            let valido = Object.assign(validos, {[isbn] : links[index]})
-            result = {...obj, valido}
-        }
-        return result
-    }, {})
-}
-*/
-/*
-const validatingIsbn = (chave, links) => { 
-    chave = Object.values(chave)
-    let invalidos = {}, validos = {}
-    for (let i = 0; i < links.length; i++) { 
-        if (links[i] == `Nenhum resultado para ${chave[i]}.`) { // tentar colocar esse if num ternario
-            let invalido = {
-                [chave[i]] : `${links[i]}`
-            }
-            Object.assign(invalidos, invalido)
-        } else {
-            let valido = {
-                [chave[i]] : links[i]
-            }
-            Object.assign(validos, valido)
-        }
-    }
-    return Object.assign({invalido : invalidos}, {valido : validos})
-}
-*/
 
 //checkIsbn(passInputIsbnInObj(inputIsbn))
 
