@@ -10,13 +10,13 @@ var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
  * @param {Array} isbns Sera convertido em objeto
  * @returns {Object} Array convertido
  */
+
 const passInputIsbnInObj = (isbns) => {
-    let i = 0
-    return isbns.reduce((acc, elem) => {
-        const obj = {...acc, [i] : elem}
-        i++
-        return obj
-    }, {})
+    const obj = {}
+    for (let i = 0; i < isbns.length; i++) {
+        obj[[i]] = isbns[i];
+    }
+    return obj
 }
 
 const checkIsbn = async(isbns) => {
@@ -84,7 +84,6 @@ module.exports = {
 */
 
 // Exportado para pagina de test
-
 
 module.exports = { 
     passInputIsbnInObj,
