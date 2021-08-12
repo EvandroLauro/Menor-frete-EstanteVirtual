@@ -12,8 +12,8 @@ var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
  */
 const passInputIsbnInObj = (isbns) => {
     let i = 0
-    return isbns.reduce((acc, val) => {
-        const obj = {...acc, [i] : val}
+    return isbns.reduce((acc, elem) => {
+        const obj = {...acc, [i] : elem}
         i++
         return obj
     }, {})
@@ -55,26 +55,51 @@ const formatOrganizingDataForClassification = (link) => {
         .replace(/,/g, '')
 }
 
-const validatingIsbn = (chave, valor) => { 
+function validatingIsbn(isbns, links) {
+    const valido = {}, invalido = {};
+    let isbn = Object.values(isbns)
+    for (let i = 0; i < links.length; i++) {
+        const categoria = links[i] === `Nenhum resultado para ${isbn[i]}.` ? invalido : valido;
+        categoria[isbn[i]] = links[i];
+    }
+    return {invalido, valido}
+}
+/*
+const validatingIsbn = (isbns, links) => {
+    let invalidos = {}, validos = {}
+    return Object.values(isbns).reduce((obj, isbn, index) => {
+        let result 
+        if (links[index] == `Nenhum resultado para ${[isbn]}.`) {
+            let invalido = Object.assign(invalidos, {[isbn] : links[index]})
+            result = {...obj, invalido}
+        } else {
+            let valido = Object.assign(validos, {[isbn] : links[index]})
+            result = {...obj, valido}
+        }
+        return result
+    }, {})
+}
+*/
+/*
+const validatingIsbn = (chave, links) => { 
     chave = Object.values(chave)
     let invalidos = {}, validos = {}
-    for (let i = 0; i < valor.length; i++) { 
-        if (valor[i] == 'Nenhum resultado para ') { // tentar colocar esse if num ternario
+    for (let i = 0; i < links.length; i++) { 
+        if (links[i] == `Nenhum resultado para ${chave[i]}.`) { // tentar colocar esse if num ternario
             let invalido = {
-                [chave[i]] : `${valor[i]}${chave[i]}`
+                [chave[i]] : `${links[i]}`
             }
             Object.assign(invalidos, invalido)
         } else {
             let valido = {
-                [chave[i]] : valor[i]
+                [chave[i]] : links[i]
             }
             Object.assign(validos, valido)
         }
     }
-    let result = Object.assign({invalido : invalidos}, {valido : validos})
-    console.log(result)
-    return result
+    return Object.assign({invalido : invalidos}, {valido : validos})
 }
+*/
 
 //checkIsbn(passInputIsbnInObj(inputIsbn))
 
@@ -88,9 +113,12 @@ module.exports = {
 
 // Exportado para pagina de test
 
+
 module.exports = { 
     passInputIsbnInObj,
     organizingDataForClassification,
-    formatOrganizingDataForClassification
-
+    formatOrganizingDataForClassification,
+    validatingIsbn
 }
+
+
