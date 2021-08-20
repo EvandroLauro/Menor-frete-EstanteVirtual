@@ -1,5 +1,5 @@
 const createRace = async() => {
-
+    
     const myScript = (funcao) => {
         const promise = new Promise((resolve, reject) => {
                 resolve(funcao)

@@ -5,6 +5,11 @@
   "main": "checkISBN.js",
   "scripts": {
     "test": "jest"
+    
+  },
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node"
   },
   "author": "",
   "license": "ISC",
@@ -12,6 +17,8 @@
     "axios": "^0.21.1",
     "cheerio": "^1.0.0-rc.10",
     "dns": "^0.2.2",
-    "node-image-downloader": "^1.0.7"
+    "lazy-ass": "^1.6.0",
+    "node-image-downloader": "^1.0.7",
+    "test-mole": "^0.2.0"
   }
 }
