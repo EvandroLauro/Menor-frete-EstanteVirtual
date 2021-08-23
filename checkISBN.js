@@ -21,25 +21,33 @@ const passIsbnForObj = (isbns) => {
 const checkIsbn = async(isbns) => {
     const scraping = await createScraping();
     const data = await scraping.start("https://amazon.com.br/s?k=", isbns);
-    const validation =  createValidation();
-    const result = validation.start(isbns, data);
+    const classification =  createClassification();
+    const result = classification.start(isbns, data);
     return result
 }
 
-const createValidation = () => {
+/**
+ * Classifica o ISBN passado
+ *
+ * @method createClassification
+ * @param {Object} isbns Sera usado de id no obj
+ * @param {Array} data Sera classificado ou considerado desclassificado
+ * @returns {Object} classificação concluída
+ */
+const createClassification = () => {
 
     const classification = (isbns, data) => {
         const links = select(data);
-        const valido = {}, invalido = {};
+        const classificado = {}, desclassificado = {};
         let isbn = Object.values(isbns);
         for (let i = 0; i < links.length; i++) {
-            const categoria = links[i] === `Nenhum resultado para ${isbn[i]}.` ? invalido : valido;
+            const categoria = links[i] === `Nenhum resultado para ${isbn[i]}.` ? desclassificado : classificado;
             categoria[isbn[i]] = links[i];
         }
-        return {invalido, valido};
+        return {desclassificado, classificado};
     }
 
-    const select =  ($) => {      
+    const select = ($) => {      
         return $.map(elem => elem('.s-no-outline').length > 0 ? format(elem('.s-no-outline').attr("href")) : elem('.a-size-medium').text());
     }
     
@@ -63,7 +71,7 @@ const createValidation = () => {
 
 module.exports = {
     passIsbnForObj,
-    createValidation
+    createClassification
 }
 
 /*
