@@ -16,7 +16,7 @@ describe("Passando a lista de ISBN para um objeto mais organizado", () => {
     })
 })
 
-describe("Organizando dados obtidos pela raspagem para classificação", () => {
+describe("Validando ISBN", () => {
     test("testando", async () => {
         let isbns = {
             0 : '64646464',
