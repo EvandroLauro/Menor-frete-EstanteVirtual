@@ -7,7 +7,8 @@ const createScraping = async() => {
     
     const controllerScraping = async(urlFixo, urlMovel) => {
         const waitingTime = 15000
-        const result = []
+        //const result = []
+        const result = {}
         for (i in urlMovel) {
             const urlMovelX = urlMovel[i]
             while (true) {
@@ -20,7 +21,8 @@ const createScraping = async() => {
                     const resultado = await race.start(scraping(urlFixo, urlMovelX), waitingTime)
                     await new Promise(resolve => setTimeout(resolve, 500))
                     if (resultado != "Sem internet, ou site indisponivel") {
-                        result.push(resultado)
+                        //result.push(resultado)
+                        result[urlMovelX] = resultado;
                         break
                     }
                 } catch {

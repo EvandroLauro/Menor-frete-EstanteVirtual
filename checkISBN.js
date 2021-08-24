@@ -22,32 +22,32 @@ const checkIsbn = async(isbns) => {
     const scraping = await createScraping();
     const data = await scraping.start("https://amazon.com.br/s?k=", isbns);
     const classification =  createClassification();
-    const result = classification.start(isbns, data);
+    const result = classification.start(data);
     return result
 }
 
 /**
- * Classifica o ISBN passado
+ * Classifica os ISBN's passado entre classificado e desclassificado
  *
  * @method createClassification
- * @param {Object} isbns Sera usado de id no obj
- * @param {Array} data Sera classificado ou considerado desclassificado
+ * @param {Object} data Sera classificado
  * @returns {Object} classificação concluída
  */
 const createClassification = () => {
 
-    const classification = (isbns, data) => {
-        const links = select(data);
+    const classification = (data) => {
+        let links = select(data);
+        let chave = Object.keys(data);
         const classificado = {}, desclassificado = {};
-        let isbn = Object.values(isbns);
         for (let i = 0; i < links.length; i++) {
-            const categoria = links[i] === `Nenhum resultado para ${isbn[i]}.` ? desclassificado : classificado;
-            categoria[isbn[i]] = links[i];
+            const categoria = links[i] === `Nenhum resultado para ${chave[i]}.` ? desclassificado : classificado;
+            categoria[chave[i]] = links[i];
         }
         return {desclassificado, classificado};
     }
 
     const select = ($) => {      
+        $ = Object.values($);
         return $.map(elem => elem('.s-no-outline').length > 0 ? format(elem('.s-no-outline').attr("href")) : elem('.a-size-medium').text());
     }
     
@@ -60,8 +60,8 @@ const createClassification = () => {
     }
     
     return {
-        start(isbns, data) {
-            return classification(isbns, data);
+        start(data) {
+            return classification(data);
         }
     };
 
