@@ -24,7 +24,7 @@ describe("Validando ISBN", () => {
             2 : '978-8573076103',
             3 : '6586057043'
         };
-        let result = {
+        let classificado = {
             desclassificado : { '64646464': 'Nenhum resultado para 64646464.' },
             classificado : {
                 '978-8575228050': '/Problemas-Cl%C3%A1ssicos-Ci%C3%AAncia-Computa%C3%A7%C3%A3o-Python/dp/8575228056',
@@ -32,14 +32,15 @@ describe("Validando ISBN", () => {
                 '6586057043': '/Migrando-Sistemas-Monol%C3%ADticos-Para-Microsservi%C3%A7os/dp/6586057043'
             }
         };
-        let data = [];
+        let result = {};
         for (i in isbns) { // Não utilizei um Promise.all com map aqui pois eu acho que assim fica mais legível
             let html = await axios.get("https://amazon.com.br/s?k=".concat(isbns[i]));
             jest.setTimeout(100000);
-            data.push(cheerio.load(html.data));
+            let data = cheerio.load(html.data);
+            result[isbns[i]] = data;
         }
         const classification = createClassification();
-        expect(classification.start(isbns, data)).toEqual(result);
+        expect(classification.start(result)).toEqual(classificado);
     }, 100000)
 })
 
