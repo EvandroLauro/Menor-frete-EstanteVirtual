@@ -1,0 +1,33 @@
+<html>
+    <head>
+        
+    </head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <!--=<script type="text/javascript" src="index.js"></script>-->
+    <body>
+        <div id="corpo-externo">
+            <div id="corpo-interno-um">
+                <input id="entrada-um" type="text" value="Adicione o ISBN"/>
+                <button id="btn-entrada-um"type="button">Adicionar</button>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script>
+
+    function clickInput() {  
+        let input = document.getElementById("entrada-um"); 
+        input.addEventListener("click", function(event) {
+            input.value = "";
+        });
+        document.addEventListener('click', function(event) {         // copiei esse codigo, não entendo muito bem como esse
+            let isClickInsideElement = input.contains(event.target); // contains(event.target) funciona
+            if (!isClickInsideElement && input.value == "") {
+                input.value = "Adicione o ISBN";
+            } 
+        });
+    }
+    window.addEventListener("load", clickInput);
+
+</script>
