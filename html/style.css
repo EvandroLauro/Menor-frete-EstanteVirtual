@@ -18,13 +18,31 @@
     border: rgb(172, 170, 170) solid;
 }
 
-#entrada-um{
+#input-pagina-um{
     position: absolute;
     left: 32%;
 }
 
-#btn-entrada-um {
+#btnAdicionar-pagina-um {
     margin-top: 25px;
     margin-left: 254px;
     cursor: pointer;
+}
+
+#list-isbn {
+    width: 200px;
+    height: 400px;
+    position: absolute;
+    left: 29%;
+    margin-top: 10px;
+    border: rgb(172, 170, 170) solid;
+}
+
+.box-isbn{
+    width: 190px;
+    height: 20px;
+    margin-top: 2px;
+    margin-left: 2px;
+    border: rgb(172, 170, 170) solid;
+
 }
