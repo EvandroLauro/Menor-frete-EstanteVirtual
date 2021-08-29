@@ -18,7 +18,7 @@
     border: rgb(172, 170, 170) solid;
 }
 
-#input-pagina-um{
+#input-pagina-um {
     position: absolute;
     left: 32%;
 }
@@ -38,11 +38,17 @@
     border: rgb(172, 170, 170) solid;
 }
 
-.box-isbn{
+.box-isbn {
     width: 190px;
-    height: 20px;
+    height: 21px;
     margin-top: 2px;
     margin-left: 2px;
     border: rgb(172, 170, 170) solid;
+}
 
+.btn-delete {    
+    margin-top: 3px;
+    margin-right: 2px;
+    font-size: 8px;
+    float: right;
 }

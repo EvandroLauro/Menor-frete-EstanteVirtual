@@ -21,22 +21,36 @@
 
     function adicionarISBN(){
         let input = document.getElementById("input-pagina-um");
-        if (isRepetido(input.value) == input.value) {
-            alert(`'${input.value}' FOI INSERIDO, ADICIONE O PRÓXIMO!`);
+        if (isRepetido(input.value) == input.value && !(input.value == "")) {
+            alert(`'${input.value}' FOI INSERIDO, ADICIONE OUTRO ISBN!`);
             input.value = 'Adicione o ISBN';
         } else if (!(input.value == "" || input.value == 'Adicione o ISBN')) {
             let isbn = document.createElement("div");    
-                isbn.setAttribute("id", input.value);
-                isbn.setAttribute("class", 'box-isbn');
-                document.getElementById("list-isbn").prepend(isbn);
-                document.getElementById(input.value).innerText  = input.value;
-                input.value = 'Adicione o ISBN';
+            isbn.setAttribute("id", input.value);
+            isbn.setAttribute("class", "box-isbn");
+            document.getElementById("list-isbn").prepend(isbn);
+            document.getElementById(input.value).innerText = input.value;
+            
+            let btnDelete = document.createElement("button")
+            let idBtnDelete = "btn-delete-".concat(input.value)
+            btnDelete.setAttribute("id", idBtnDelete);
+            btnDelete.setAttribute("class", "btn-delete");
+            btnDelete.setAttribute("onclick", `deletarISBN('${idBtnDelete}')`)
+            document.getElementById(input.value).prepend(btnDelete);
+            document.getElementById(idBtnDelete).innerText = "x";
+            
+            input.value = 'Adicione o ISBN';
         }
 
         function isRepetido(valor) {
             let filhos = document.getElementById("list-isbn").children;
-            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText).filter((elem) => elem == valor);
+            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/x+\n/,'')).filter((elem) => elem == valor);
         }
+        
+    }
+
+    function deletarISBN(id) {
+        console.log(id)
     }
 
     function clickDescliqueInput() {
@@ -60,6 +74,9 @@
         });
     }
 
+   
     window.addEventListener("load", clickDescliqueInput);
+
+   
 
 </script>
