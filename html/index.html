@@ -9,9 +9,7 @@
             <div id="corpo-interno-um">
                 <input id="input-pagina-um" type="text" value="Adicione o ISBN"/>
                 <button id="btnAdicionar-pagina-um" type="button" onclick='adicionarISBN()'>Adicionar</button>
-                <div id="list-isbn">
-
-                </div>
+                <div id="list-isbn"></div>
             </div>
         </div>
     </body>
@@ -19,32 +17,56 @@
 
 <script>
 
-    function adicionarISBN(){
+    function adicionarISBN() {
         let input = document.getElementById("input-pagina-um");
-        if (isRepetido(input.value) == input.value && !(input.value == "")) {
-            alert(`'${input.value}' FOI INSERIDO, ADICIONE OUTRO ISBN!`);
+        let isbn = input.value.replace(/\s/g, ''); // Remove espaços em branco
+        if (isRepetido(isbn) == isbn && !(isbn == "")) {
+            alert(`'${isbn}' FOI INSERIDO, ADICIONE OUTRO ISBN!`);
             input.value = 'Adicione o ISBN';
-        } else if (!(input.value == "" || input.value == 'Adicione o ISBN')) {
-            let isbn = document.createElement("div");    
-            isbn.setAttribute("id", input.value);
-            isbn.setAttribute("class", "box-isbn");
-            document.getElementById("list-isbn").prepend(isbn);
-            document.getElementById(input.value).innerText = input.value;
-            
-            let btnDelete = document.createElement("button")
-            let idBtnDelete = "btn-delete-".concat(input.value)
-            btnDelete.setAttribute("id", idBtnDelete);
-            btnDelete.setAttribute("class", "btn-delete");
-            btnDelete.setAttribute("onclick", `deletarISBN('${idBtnDelete}')`)
-            document.getElementById(input.value).prepend(btnDelete);
-            document.getElementById(idBtnDelete).innerText = "x";
-            
+        } else if (isValid(isbn) == true) {
+            alert(`O VALOR '${isbn}' INSERIDO É INVÁLIDO, TENTE OUTRO!`);
+            input.value = 'Adicione o ISBN';
+        } else if (!(isbn == "" || isbn == 'AdicioneoISBN')) {
+            addElement(isbn)
+            addText(isbn)
+            addBtnDelete(isbn)
             input.value = 'Adicione o ISBN';
         }
 
-        function isRepetido(valor) {
+        function isRepetido(isbn) {
             let filhos = document.getElementById("list-isbn").children;
-            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/x+\n/,'')).filter((elem) => elem == valor);
+            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/x+\n/,'')).filter((elem) => elem == isbn);
+        }
+
+        // Impede que espaços em branco seja inserido, depois vou impedir que outros valores seja inserido
+        function isValid(isbn) {
+            return /^\s*$/.test(isbn);
+        }
+
+        function addElement(isbn) {
+            let element = document.createElement("div");    
+            element.setAttribute("id", isbn);
+            element.setAttribute("class", "element-isbn");
+            document.getElementById("list-isbn").prepend(element);  
+        }
+
+        function addText(isbn) {
+            let text = document.createElement("div");
+            let idText = "ISBN-".concat(isbn);
+            text.setAttribute("id", idText);
+            text.setAttribute("class", "text-isbn");
+            document.getElementById(isbn).prepend(text);
+            document.getElementById(idText).innerText = isbn;
+        }
+
+        function addBtnDelete(isbn) {
+            let btnDelete = document.createElement("button")
+            let idBtnDelete = "btn-delete-".concat(isbn)
+            btnDelete.setAttribute("id", idBtnDelete);
+            btnDelete.setAttribute("class", "btn-delete-isbn");
+            btnDelete.setAttribute("onclick", `deletarISBN('${idBtnDelete}')`)
+            document.getElementById(isbn).prepend(btnDelete);
+            document.getElementById(idBtnDelete).innerText = "x";
         }
         
     }
@@ -73,7 +95,6 @@
             }
         });
     }
-
    
     window.addEventListener("load", clickDescliqueInput);
 

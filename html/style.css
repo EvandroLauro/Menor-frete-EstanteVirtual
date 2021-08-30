@@ -38,7 +38,7 @@
     border: rgb(172, 170, 170) solid;
 }
 
-.box-isbn {
+.element-isbn {
     width: 190px;
     height: 21px;
     margin-top: 2px;
@@ -46,9 +46,13 @@
     border: rgb(172, 170, 170) solid;
 }
 
-.btn-delete {    
+.btn-delete-isbn {    
     margin-top: 3px;
     margin-right: 2px;
     font-size: 8px;
     float: right;
+}
+
+.text-isbn {
+    margin-left: 2px;
 }
