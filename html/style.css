@@ -30,12 +30,13 @@
 }
 
 #list-isbn {
-    width: 200px;
+    width: 218px;
     height: 400px;
     position: absolute;
-    left: 29%;
+    left: 27%;
     margin-top: 10px;
     border: rgb(172, 170, 170) solid;
+    overflow-y: scroll;
 }
 
 .element-isbn {

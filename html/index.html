@@ -19,7 +19,7 @@
 
     function adicionarISBN() {
         let input = document.getElementById("input-pagina-um");
-        let isbn = input.value.replace(/\s/g, ''); // Remove espaços em branco
+        let isbn = input.value.replace(/\s/g, ''); // Remove espaços em branco entre os caracteres
         if (isRepetido(isbn) == isbn && !(isbn == "")) {
             alert(`'${isbn}' FOI INSERIDO, ADICIONE OUTRO ISBN!`);
             input.value = 'Adicione o ISBN';
@@ -27,9 +27,9 @@
             alert(`O VALOR '${isbn}' INSERIDO É INVÁLIDO, TENTE OUTRO!`);
             input.value = 'Adicione o ISBN';
         } else if (!(isbn == "" || isbn == 'AdicioneoISBN')) {
-            addElement(isbn)
-            addText(isbn)
-            addBtnDelete(isbn)
+            addElement(isbn);
+            addText(isbn);
+            addBtnDelete(isbn);
             input.value = 'Adicione o ISBN';
         }
 
@@ -38,7 +38,10 @@
             return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/x+\n/,'')).filter((elem) => elem == isbn);
         }
 
-        // Impede que espaços em branco seja inserido, depois vou impedir que outros valores seja inserido
+        /* 
+            Impede que espaços em branco seja inserido, depois vou impedir que outros valores seja inserido
+            os valores que pode ser inserido é apenas 5835385385(numeros) e valores igual a esse 978-8573076103
+        */
         function isValid(isbn) {
             return /^\s*$/.test(isbn);
         }
@@ -64,7 +67,7 @@
             let idBtnDelete = "btn-delete-".concat(isbn)
             btnDelete.setAttribute("id", idBtnDelete);
             btnDelete.setAttribute("class", "btn-delete-isbn");
-            btnDelete.setAttribute("onclick", `deletarISBN('${idBtnDelete}')`)
+            btnDelete.setAttribute("onclick", `deletarISBN('${isbn}')`)
             document.getElementById(isbn).prepend(btnDelete);
             document.getElementById(idBtnDelete).innerText = "x";
         }
@@ -72,7 +75,8 @@
     }
 
     function deletarISBN(id) {
-        console.log(id)
+        let element = document.getElementById(id);
+        element.remove();
     }
 
     function clickDescliqueInput() {
@@ -95,9 +99,9 @@
             }
         });
     }
+
+    
    
     window.addEventListener("load", clickDescliqueInput);
-
-   
 
 </script>
