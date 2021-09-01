@@ -16,7 +16,12 @@
 </html>
 
 <script>
-
+    /*
+        Proxima incrementação é, ao passar o mouse em cima do X(deleta), é para a seta virar uma maozinha e aparecer
+        um balaozinho escrito excluir, depois aparecer um alerta perguntando se o usuario quer realmente excluir o isbn
+        nesse alert que vai aparecer deve ter dois botões, Sim(que quer excluir) e não(nao quer excluir), se sim delata 
+        o isbn e fecha o alert, se n só fecha o alert.
+    */
     function adicionarISBN() {
         let input = document.getElementById("input-pagina-um");
         let isbn = input.value.replace(/\s/g, ''); // Remove espaços em branco entre os caracteres
@@ -28,14 +33,15 @@
             input.value = 'Adicione o ISBN';
         } else if (!(isbn == "" || isbn == 'AdicioneoISBN')) {
             addElement(isbn);
-            addText(isbn);
-            addBtnDelete(isbn);
+            addTextISBN(isbn);
+            addBtnExcluirISBN(isbn);
+            scrollBarListISBN();
             input.value = 'Adicione o ISBN';
         }
 
         function isRepetido(isbn) {
             let filhos = document.getElementById("list-isbn").children;
-            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/x+\n/,'')).filter((elem) => elem == isbn);
+            return Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/X+\n/,'')).filter((elem) => elem == isbn);
         }
 
         /* 
@@ -53,30 +59,42 @@
             document.getElementById("list-isbn").prepend(element);  
         }
 
-        function addText(isbn) {
-            let text = document.createElement("div");
-            let idText = "ISBN-".concat(isbn);
-            text.setAttribute("id", idText);
-            text.setAttribute("class", "text-isbn");
-            document.getElementById(isbn).prepend(text);
-            document.getElementById(idText).innerText = isbn;
+        function addTextISBN(isbn) {
+            let textISBN = document.createElement("div");
+            let idTextISBN = "isbn-".concat(isbn);
+            textISBN.setAttribute("id", idTextISBN);
+            textISBN.setAttribute("class", "text-isbn");
+            document.getElementById(isbn).prepend(textISBN);
+            document.getElementById(idTextISBN).innerText = isbn;
         }
 
-        function addBtnDelete(isbn) {
-            let btnDelete = document.createElement("button")
-            let idBtnDelete = "btn-delete-".concat(isbn)
-            btnDelete.setAttribute("id", idBtnDelete);
-            btnDelete.setAttribute("class", "btn-delete-isbn");
-            btnDelete.setAttribute("onclick", `deletarISBN('${isbn}')`)
-            document.getElementById(isbn).prepend(btnDelete);
-            document.getElementById(idBtnDelete).innerText = "x";
+        function addBtnExcluirISBN(isbn) {
+            let btnExcluirISBN = document.createElement("button");
+            let idBtnExcluirISBN = "btn-excluir-".concat(isbn);
+            btnExcluirISBN.setAttribute("id", idBtnExcluirISBN);
+            btnExcluirISBN.setAttribute("class", "btn-excluir-isbn");
+            btnExcluirISBN.setAttribute("onclick", `excluirISBN('${isbn}')`);
+            document.getElementById(isbn).prepend(btnExcluirISBN);
+            document.getElementById(idBtnExcluirISBN).innerText = "X";
         }
         
     }
 
-    function deletarISBN(id) {
+    function excluirISBN(id) {
         let element = document.getElementById(id);
         element.remove();
+        scrollBarListISBN();
+    }
+
+    function scrollBarListISBN() { 
+        let pai = document.getElementById("list-isbn")
+        let filhos = pai.children;
+        let quantidade = Object.entries(filhos).map((elem, index) => filhos.item(index).innerText.replace(/X+\n/,''))  
+        if (quantidade.length == 14) {
+            pai.style.overflowY = "scroll";
+        } else if (quantidade.length == 13) {
+            pai.style.overflowY = "hidden";
+        }
     }
 
     function clickDescliqueInput() {
@@ -89,7 +107,7 @@
         // Não entendo muito bem como esse contains(event.target) funciona
         document.addEventListener('click', function(event) {              
             let isClickInsideElementInput = input.contains(event.target); 
-            let isClickInsideElementBtnAdicionar = btnAdicionar.contains(event.target)
+            let isClickInsideElementBtnAdicionar = btnAdicionar.contains(event.target);
             if (!isClickInsideElementInput && !isClickInsideElementBtnAdicionar && input.value == "Adicione o ISBN") {
                 input.value = "Adicione o ISBN";
             } else if (!isClickInsideElementInput && !isClickInsideElementBtnAdicionar && input.value == "") {
