@@ -4,11 +4,14 @@
     </head>
     <link rel="stylesheet" type="text/css" href="style.css">
     <!--=<script type="text/javascript" src="index.js"></script>-->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     <body>
         <div id="corpo-externo">
             <div id="corpo-interno-um">
                 <input id="input-pagina-um" type="text" value="Adicione o ISBN"/>
                 <button id="btnAdicionar-pagina-um" type="button" onclick='adicionarISBN()'>Adicionar</button>
+                <p id="subtotal-isbn">Subtotal (0 isbn)</p>
                 <div id="list-isbn"></div>
             </div>
         </div>
@@ -16,25 +19,21 @@
 </html>
 
 <script>
-    /*
-        Proxima incrementação é, ao passar o mouse em cima do X(deleta), é para a seta virar uma maozinha e aparecer
-        um balaozinho escrito excluir, depois aparecer um alerta perguntando se o usuario quer realmente excluir o isbn
-        nesse alert que vai aparecer deve ter dois botões, Sim(que quer excluir) e não(nao quer excluir), se sim delata 
-        o isbn e fecha o alert, se n só fecha o alert.
-    */
+  
     function adicionarISBN() {
         let input = document.getElementById("input-pagina-um");
         let isbn = input.value.replace(/\s/g, ''); // Remove espaços em branco entre os caracteres
         if (isRepetido(isbn) == isbn && !(isbn == "")) {
             alert(`'${isbn}' FOI INSERIDO, ADICIONE OUTRO ISBN!`);
             input.value = 'Adicione o ISBN';
-        } else if (isValid(isbn) == true) {
+        } else if (isValid(isbn) == false) {
             alert(`O VALOR '${isbn}' INSERIDO É INVÁLIDO, TENTE OUTRO!`);
             input.value = 'Adicione o ISBN';
         } else if (!(isbn == "" || isbn == 'AdicioneoISBN')) {
             addElement(isbn);
             addTextISBN(isbn);
             addBtnExcluirISBN(isbn);
+            controllerSubtotal(1);
             scrollBarListISBN();
             input.value = 'Adicione o ISBN';
         }
@@ -45,11 +44,11 @@
         }
 
         /* 
-            Impede que espaços em branco seja inserido, depois vou impedir que outros valores seja inserido
-            os valores que pode ser inserido é apenas 5835385385(numeros) e valores igual a esse 978-8573076103
+           Impedi que certos valores seja inserido, como *&% etc... e permiti que apenas numeros, letras e -(hífen)
+           pode ser inserido, mas ainda não esta bom, uma vez que o usuario pode serir AAAAAAAAAAA ou -----------
         */
         function isValid(isbn) {
-            return /^\s*$/.test(isbn);
+            return /^([a-zA-Z0-9--]{10,14})$/.test(isbn);
         }
 
         function addElement(isbn) {
@@ -76,16 +75,26 @@
             btnExcluirISBN.setAttribute("onclick", `excluirISBN('${isbn}')`);
             document.getElementById(isbn).prepend(btnExcluirISBN);
             document.getElementById(idBtnExcluirISBN).innerText = "X";
+            AddTooltip(idBtnExcluirISBN, "Excluir");
         }
         
     }
 
     function excluirISBN(id) {
-        let element = document.getElementById(id);
-        element.remove();
-        scrollBarListISBN();
+        let decisão = confirm("VOCÊ QUER DELETAR O ISBN?");
+        if (decisão == true) { 
+            let element = document.getElementById(id);
+            element.remove();
+            controllerSubtotal(-1);
+            scrollBarListISBN();
+        }
     }
 
+    function controllerSubtotal(num) {
+        let subtotal = document.getElementById("subtotal-isbn").innerText;
+        document.getElementById("subtotal-isbn").innerText = `Subtotal (${num + parseInt(subtotal.replace( /[Subtotal|isbn|()]/g, ""))} isbn)`;
+    }
+    
     function scrollBarListISBN() { 
         let pai = document.getElementById("list-isbn")
         let filhos = pai.children;
@@ -95,6 +104,15 @@
         } else if (quantidade.length == 13) {
             pai.style.overflowY = "hidden";
         }
+    }
+
+    function AddTooltip(id, valor) {
+        tippy(`#${id}`, {
+            content: valor,
+            placement: 'right',
+            arrow: true,
+            arrowType: true
+        });       
     }
 
     function clickDescliqueInput() {
@@ -117,9 +135,7 @@
             }
         });
     }
-
     
-   
     window.addEventListener("load", clickDescliqueInput);
 
 </script>

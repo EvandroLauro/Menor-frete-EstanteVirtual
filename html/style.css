@@ -36,24 +36,31 @@
     left: 27%;
     margin-top: 10px;
     border: rgb(172, 170, 170) solid;
-    overflow-y: scroll;
 }
 
 .element-isbn {
-    width: 190px;
+    width: 168px;
     height: 21px;
     margin-top: 2px;
-    margin-left: 2px;
+    margin-left: 21.5px;
     border: rgb(172, 170, 170) solid;
 }
 
-.btn-delete-isbn {    
+.btn-excluir-isbn {    
     margin-top: 3px;
     margin-right: 2px;
     font-size: 8px;
     float: right;
+    cursor: pointer;
 }
 
 .text-isbn {
     margin-left: 2px;
+}
+
+#subtotal-isbn {
+    position: absolute;
+    margin-top: -10px;
+    margin-left: 123px;
+    font-size: smaller;
 }
