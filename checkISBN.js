@@ -1,8 +1,9 @@
 const {createScraping} = require('./createRunSCRAPING')
 
 //var inputIsbn = ['978-8573076103']
-var inputIsbn  = ['64646464', '978-8575228050', '978-8573076103', '6586057043']
+//var inputIsbn  = ['64646464', 'B0108F7GT4', 'B07662PR6N', '6550440181', '8575224743', 'B08QQ9CQYB', '8525063096', '0399501487','8535932879', 'B07MTRGXFC', '978-8575228050', '978-8573076103', '6586057043', '978-8535929881', '978-9588931623', 'B075JMXJLH' ]
 
+var inputIsbn = ['8545203721', '8545202881']
 /**
  *  Passando a lista de ISBN para um objeto"
  * 
@@ -20,33 +21,32 @@ const passIsbnForObj = (isbns) => {
 
 const checkIsbn = async(isbns) => {
     const scraping = await createScraping();
-    const data = await scraping.start("https://amazon.com.br/s?k=", isbns);
-    const classification =  createClassification();
-    const result = classification.start(data);
-    return result
+    const data = await scraping.start("https://amazon.com.br/s?k=", isbns, "checkIsbn");
+    const is = isISBN(); 
+    return is.start(data);
 }
 
 /**
- * Classifica os ISBN's passado entre classificado e desclassificado
+ * Verifica se os ISBN's passado entre existe ou não
  *
- * @method createClassification
- * @param {Object} data Sera classificado
- * @returns {Object} classificação concluída
+ * @method isISBN
+ * @param {Object} data Existencia sera analisada
+ * @returns {Object} Análise concluída
  */
-const createClassification = () => {
+const isISBN = () => {
 
-    const classification = (data) => {
-        let links = select(data);
+    const is = (data) => {
+        let links = exist(data);
         let chave = Object.keys(data);
-        const classificado = {}, desclassificado = {};
+        const inexistente = {}, existente = {};
         for (let i = 0; i < links.length; i++) {
-            const categoria = links[i] === `Nenhum resultado para ${chave[i]}.` ? desclassificado : classificado;
+            const categoria = links[i] === `Nenhum resultado para ${chave[i]}.` ? inexistente : existente;
             categoria[chave[i]] = links[i];
         }
-        return {desclassificado, classificado};
+        return {inexistente, existente};
     }
 
-    const select = ($) => {      
+    const exist = ($) => {      
         $ = Object.values($);
         return $.map(elem => elem('.s-no-outline').length > 0 ? format(elem('.s-no-outline').attr("href")) : elem('.a-size-medium').text());
     }
@@ -61,7 +61,7 @@ const createClassification = () => {
     
     return {
         start(data) {
-            return classification(data);
+            return is(data);
         }
     };
 
@@ -69,10 +69,12 @@ const createClassification = () => {
 
 //checkIsbn(passIsbnForObj(inputIsbn))
 
+
 module.exports = {
     passIsbnForObj,
-    createClassification
+    isISBN
 }
+
 
 /*
 const checkIsbn = async(isbns) => {

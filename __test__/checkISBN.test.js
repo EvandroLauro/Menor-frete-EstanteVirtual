@@ -1,6 +1,6 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const {passIsbnForObj, createClassification} = require('../checkISBN.js');
+const {passIsbnForObj, isISBN} = require('../checkISBN.js');
 //const {passIsbnForObj, select, format, classification} = require('../checkISBN.js')
 
 describe("Passando a lista de ISBN para um objeto mais organizado", () => {    
@@ -24,9 +24,9 @@ describe("Validando ISBN", () => {
             2 : '978-8573076103',
             3 : '6586057043'
         };
-        let classificado = {
-            desclassificado : { '64646464': 'Nenhum resultado para 64646464.' },
-            classificado : {
+        let existe = {
+            inexistente : { '64646464': 'Nenhum resultado para 64646464.' },
+            existente : {
                 '978-8575228050': '/Problemas-Cl%C3%A1ssicos-Ci%C3%AAncia-Computa%C3%A7%C3%A3o-Python/dp/8575228056',
                 '978-8573076103': '/Padr%C3%B5es-Projetos-Solu%C3%A7%C3%B5es-Reutiliz%C3%A1veis-Orientados/dp/8573076100',
                 '6586057043': '/Migrando-Sistemas-Monol%C3%ADticos-Para-Microsservi%C3%A7os/dp/6586057043'
@@ -39,8 +39,9 @@ describe("Validando ISBN", () => {
             let data = cheerio.load(html.data);
             result[isbns[i]] = data;
         }
-        const classification = createClassification();
-        expect(classification.start(result)).toEqual(classificado);
+        
+        const is = isISBN();
+        expect(is.start(result)).toEqual(existe);
     }, 100000)
 })
 

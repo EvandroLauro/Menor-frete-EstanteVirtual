@@ -3,7 +3,7 @@ const imageDownloader = require('node-image-downloader')
 
 const isbn = {
     desclassificado: { '64646464': 'Nenhum resultado para 64646464.' },
-    classificado: {
+    existente: {
         '6550440181': '/T%C3%A9cnicas-Invas%C3%A3o-Aprenda-t%C3%A9cnicas-invas%C3%B5es/dp/6550440181',
         '8575224743': '/Express%C3%B5es-Regulares-Uma-Abordagem-Divertida/dp/8575224743',
         '8525063096': '/Livro-Filosofia-V%C3%A1rios-Autores/dp/8525063096',
@@ -20,37 +20,41 @@ const isbn = {
         'B07MTRGXFC' : '/Cria%C3%A7%C3%A3o-riqueza-metodologia-enriquec%C3%AA-lo-objetivos-ebook/dp/B07MTRGXFC',
         'B075JMXJLH' : '/PROCRASTINA%C3%87%C3%83O-cient%C3%ADfico-sobre-procrastinar-definitivamente-ebook/dp/B075JMXJLH'
     }
-}
-
+};
 
 const selectBooks = async(isbn) => {
     const scraping = await createScraping();
-    const data = await scraping.start("https://amazon.com.br", isbn.classificado, "selectBooks");
-    const analyzes = createAnalysis();
-    const desclassificado = isbn.desclassificado;
-    const classificado = analyzes.start(data);
-    const result = {desclassificado, classificado};
-    console.log(result)
+    const data = await scraping.start("https://amazon.com.br", isbn.existente, "selectBooks");
+    const select = selectNames();
+    const existente = select.start(data);
+    const inexistente = isbn.inexistente;
+    return {inexistente, existente};
 }
 
-const createAnalysis = () => {
+/**
+ *  Seleciona capa do livro, o local que sera salvo namquina, nome do livro e autor
+ * 
+ * @method selectNames
+ * @param {Object} isbn.existente Tera os respectivo dados coletado
+ * @returns {Object} Objeto com os devidos dados coletado
+ */
+const selectNames = () => {
     
-    const analysis = (data) => {
-    
+    const select = (data) => {
         let chave = Object.keys(data);
         data = Object.values(data);
         const bookname = selectBookName(data);
         const autor = selectAutor(data);
         const img = selectImg(chave, data);
-        let classificado = {};
+        let existente = {};
         for (let i = 0; i < chave.length; i++) {
-            classificado[chave[i]] = {
-                bookname :bookname[i],
+            existente[chave[i]] = {
+                bookname : bookname[i],
                 autor : autor[i],
                 imagem : img[i]
             }
         }
-        return classificado;
+        return existente;
     }
 
     const selectBookName = (data) => {
@@ -61,15 +65,15 @@ const createAnalysis = () => {
         return  data.map(elem => formatAutor(elem('#bylineInfo').text()));
     }
 
-    const selectImg = (chave, data) => {
+    const selectImg = (chave, data) => { // Talvez posso refatorar essa function, fazer de cade if e else um function e as colocar em um function ternaria
         let result = [];
         for (let i = 0; i < chave.length; i++) {
             let r;
-            if (chave[i][0] == "B") {
+            if (chave[i][0] == "B") { // Aqui pega capa de livro ebook caso o usuario confundir o codigo asin com o isbn
                 let link = data[i]('#leftCol img:eq(1)').attr("src");
                 downloaderImg(link);
                 r = link.replace("https://m.media-amazon.com/images/I/", "");
-            } else {
+            } else { // Aqui pega a capa do livro fisico mesmo
                 let link = Object.keys(JSON.parse(data[i]('#img-canvas img').attr("data-a-dynamic-image")))[0]
                 downloaderImg(link);
                 r = link.replace("https://images-na.ssl-images-amazon.com/images/I/", "");
@@ -111,12 +115,18 @@ const createAnalysis = () => {
 
     return { 
         start(data) {
-            return analysis(data);
+            return select(data);
         }
     };
 }
 
-selectBooks(isbn)
+
+// Module test
+module.exports = {
+    selectNames
+}
+
+//selectBooks(isbn)
 /*
 module.exports = {
     selectsBookRelatedToIsbn

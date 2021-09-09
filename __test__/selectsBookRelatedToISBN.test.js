@@ -1,13 +1,13 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
-const {createAnalysis} = require('../selectsBookRelatedToISBN.js');
+const {selectNames} = require('../selectsBookRelatedToISBN.js');
 
 describe("Selecionando nome do livro, autor e caminho da onde a capa do livo vai ser salva no computador", () => {
     test("test", async () => {
 
         const isbns = {
-            "desclassificado": { '64646464': 'Nenhum resultado para 64646464.' },
-            "classificado": {
+            "inexistente": { '64646464': 'Nenhum resultado para 64646464.' },
+            "existente": {
                 '6550440181': '/T%C3%A9cnicas-Invas%C3%A3o-Aprenda-t%C3%A9cnicas-invas%C3%B5es/dp/6550440181',
                 '8575224743': '/Express%C3%B5es-Regulares-Uma-Abordagem-Divertida/dp/8575224743',
                 '8525063096': '/Livro-Filosofia-V%C3%A1rios-Autores/dp/8525063096',
@@ -105,14 +105,13 @@ describe("Selecionando nome do livro, autor e caminho da onde a capa do livo vai
         };
 
         let result = {};
-        for (i in isbns.classificado) { // Não utilizei um Promise.all com map aqui pois eu acho que assim fica mais legível
-            console.log(isbns.classificado[i])
-            let html = await axios.get("https://amazon.com.br".concat(isbns.classificado[i]));
+        for (i in isbns.existente) { // Não utilizei um Promise.all com map aqui pois eu acho que assim fica mais legível
+            let html = await axios.get("https://amazon.com.br".concat(isbns.existente[i]));
             jest.setTimeout(100000);
             let data = cheerio.load(html.data);
             result[i] = data;
         }
-        const analyzes = createAnalysis(); // vou mudar o nome dessa function para selectNames 
-        expect(analyzes.start(result)).toEqual(obj);
+        const select = selectNames(); // vou mudar o nome dessa function para selectNames 
+        expect(select.start(result)).toEqual(obj);
     }, 100000);
 })
