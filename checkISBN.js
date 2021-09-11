@@ -22,8 +22,8 @@ const passIsbnForObj = (isbns) => {
 const checkIsbn = async(isbns) => {
     const scraping = await createScraping();
     const data = await scraping.start("https://amazon.com.br/s?k=", isbns, "checkIsbn");
-    const is = isISBN(); 
-    return is.start(data);
+    const checks = isISBN(); 
+    return checks.start(data);
 }
 
 /**
@@ -35,7 +35,7 @@ const checkIsbn = async(isbns) => {
  */
 const isISBN = () => {
 
-    const is = (data) => {
+    const main = (data) => {
         let links = exist(data);
         let chave = Object.keys(data);
         const inexistente = {}, existente = {};
@@ -61,7 +61,7 @@ const isISBN = () => {
     
     return {
         start(data) {
-            return is(data);
+            return main(data);
         }
     };
 

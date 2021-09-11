@@ -40,8 +40,8 @@ describe("Validando ISBN", () => {
             result[isbns[i]] = data;
         }
         
-        const is = isISBN();
-        expect(is.start(result)).toEqual(existe);
+        const checks = isISBN();
+        expect(checks.start(result)).toEqual(existe);
     }, 100000)
 })
 

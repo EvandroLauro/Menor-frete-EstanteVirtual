@@ -1,6 +1,7 @@
 const {createScraping} = require('./createRunSCRAPING')
 const imageDownloader = require('node-image-downloader')
 
+
 const isbn = {
     desclassificado: { '64646464': 'Nenhum resultado para 64646464.' },
     existente: {
@@ -22,11 +23,21 @@ const isbn = {
     }
 };
 
-const selectBooks = async(isbn) => {
+/*
+const isbn = {
+    desclassificado: { '64646464': 'Nenhum resultado para 64646464.' },
+    existente: {
+        '6550440181': '/T%C3%A9cnicas-Invas%C3%A3o-Aprenda-t%C3%A9cnicas-invas%C3%B5es/dp/6550440181',
+        'B075JMXJLH' : '/PROCRASTINA%C3%87%C3%83O-cient%C3%ADfico-sobre-procrastinar-definitivamente-ebook/dp/B075JMXJLH'
+    }
+};
+*/
+
+const selectInfoBooks = async(isbn) => {
     const scraping = await createScraping();
     const data = await scraping.start("https://amazon.com.br", isbn.existente, "selectBooks");
-    const select = selectNames();
-    const existente = select.start(data);
+    const select = await infoBooks();
+    const existente = await select.start(data);
     const inexistente = isbn.inexistente;
     return {inexistente, existente};
 }
@@ -34,24 +45,24 @@ const selectBooks = async(isbn) => {
 /**
  *  Seleciona capa do livro, o local que sera salvo namquina, nome do livro e autor
  * 
- * @method selectNames
+ * @method infoBookss
  * @param {Object} isbn.existente Tera os respectivo dados coletado
  * @returns {Object} Objeto com os devidos dados coletado
  */
-const selectNames = () => {
+const infoBooks = async () => {
     
-    const select = (data) => {
+    const main = async (data) => {
         let chave = Object.keys(data);
         data = Object.values(data);
         const bookname = selectBookName(data);
-        const autor = selectAutor(data);
-        const img = selectImg(chave, data);
+        const autor = selectAutorName(data);
+        const url = await selectInfoCapa(chave, data);
         let existente = {};
         for (let i = 0; i < chave.length; i++) {
             existente[chave[i]] = {
                 bookname : bookname[i],
                 autor : autor[i],
-                imagem : img[i]
+                url : url[i]
             }
         }
         return existente;
@@ -61,28 +72,22 @@ const selectNames = () => {
         return  data.map(elem => elem('.a-size-extra-large').text().replace(/(\r\n|\n|\r)/gm, ""));
     }
 
-    const selectAutor = (data) => {
+    const selectAutorName = (data) => {
         return  data.map(elem => formatAutor(elem('#bylineInfo').text()));
     }
 
-    const selectImg = (chave, data) => { // Talvez posso refatorar essa function, fazer de cade if e else um function e as colocar em um function ternaria
-        let result = [];
-        for (let i = 0; i < chave.length; i++) {
-            let r;
-            if (chave[i][0] == "B") { // Aqui pega capa de livro ebook caso o usuario confundir o codigo asin com o isbn
-                let link = data[i]('#leftCol img:eq(1)').attr("src");
-                downloaderImg(link);
-                r = link.replace("https://m.media-amazon.com/images/I/", "");
-            } else { // Aqui pega a capa do livro fisico mesmo
-                let link = Object.keys(JSON.parse(data[i]('#img-canvas img').attr("data-a-dynamic-image")))[0]
-                downloaderImg(link);
-                r = link.replace("https://images-na.ssl-images-amazon.com/images/I/", "");
-            }
-            result.push(r);
-        }   
-        return result;
+    
+    const selectInfoCapa = async (chave, data) => {
+        const capaEbook = (data) => {
+            return data('#leftCol img:eq(1)').attr("src");
+        }
+        const capaFisico = (data) => {
+            return Object.keys(JSON.parse(data('#img-canvas img').attr("data-a-dynamic-image")))[0];
+        }
+        const url = chave.map((elem, index) => elem[0] == "B" ? capaEbook(data[index]) : capaFisico(data[index]));
+        return await Promise.all(url.map(elem => downloadImg(elem)))
     }
-
+    
     const formatAutor = (texto) => {
         const valoresQueServiraDeReferenciaParaRemoverOsIndesajado = ["›", ","];
         let textoPréFormatadoTexto = texto.replace(/(\r\n|\n|Edição|Português|by|por|Kindle|Edition|Format:|eBook|Kindle|Formato:|Author|Autor|[(\)])/gm, "");
@@ -97,15 +102,16 @@ const selectNames = () => {
         return textoPréFormatadoTexto.slice(iniciodDoTexto, posiçãoReferencia);
     }
 
-    const downloaderImg = (link) => {
-        imageDownloader({
+    const downloadImg = async (link) => {
+        return await imageDownloader({
             imgs: [
                 {
                     uri: link
                 }
             ], dest: './downloads', })
             .then((info) => {
-                console.log('all done', info);
+                return info[0].path;
+            
             })
             .catch((error, response, body) => {
                 console.log('something goes bad!');
@@ -115,7 +121,7 @@ const selectNames = () => {
 
     return { 
         start(data) {
-            return select(data);
+            return main(data);
         }
     };
 }
@@ -123,10 +129,10 @@ const selectNames = () => {
 
 // Module test
 module.exports = {
-    selectNames
+    infoBooks
 }
 
-//selectBooks(isbn)
+selectInfoBooks(isbn)
 /*
 module.exports = {
     selectsBookRelatedToIsbn
