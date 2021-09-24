@@ -2,100 +2,80 @@ const Jimp = require('jimp');
 const { getPaletteFromURL } = require('color-thief-node');
 const fs = require('fs');
 
-async function main() {
-    fs.unlinkSync('result.png');
-    const img = 'imagem.jpg'
-    var obj = {
-        direito: 0,
-        esquerdo: 0,
-        top: 0,
-        baixo: 0
-    };
-
-    // get position direito
-    var posDireito = 1;
-    var colorPalleteDireito = [];
-    while (true) {
-        const image = await Jimp.read(img);
-        const h = image.bitmap.height;
-        const w = image.bitmap.width;
-        image.crop(0, 0, posDireito, h).write('crop.png'); 
-        await new Promise(resolve => setTimeout(resolve, 100))
-        colorPalleteDireito = await getPaletteFromURL('crop.png');
-        if (colorPalleteDireito.length > 1) {
-        obj.direito = posDireito; 
-        fs.unlinkSync('crop.png');
-        break;
-        }
-        posDireito = posDireito + 1;
-        fs.unlinkSync('crop.png');
-    }
+const editarImagem = async() => {
     
-    // get position crop esquerdo
-    var posEsquerdo = 1;
-    var colorPalleteEsquerdo = [];
-    while (true) { 
-        const image = await Jimp.read(img);
-        const h = image.bitmap.height;
-        const w = image.bitmap.width;
-        image.crop(1, 0, posEsquerdo, h).write('crop.png');
-        await new Promise(resolve => setTimeout(resolve, 100));
-        colorPalleteEsquerdo = await getPaletteFromURL('crop.png');
-        if (colorPalleteEsquerdo.length > 1) {
-        obj.esquerdo = posEsquerdo;
-        fs.unlinkSync('crop.png');
-        break;
+    const main = async (image) => {
+        const position = {
+            rigth: 0,
+            left: 0,
+            top: 0,
+            bottom: 0
         }
-        posEsquerdo = posEsquerdo + 1;
-        fs.unlinkSync('crop.png');
+        // Quero colocar isso em uma promessa.all
+        position.rigth = await identifyBorder("rigth", image);  //direito
+        position.left = await identifyBorder("left", image);    //esquero 
+        position.top = await identifyBorder("top", image);      //topo
+        position.bottom = await identifyBorder("bottom", image);//fundo
+        await editar(image,position)
     }
 
-    // get position crop top
-    var posTop = 1;
-    var colorPalleteTop = [];
-    while (true) { 
-        const image = await Jimp.read(img);
-        const h = image.bitmap.height;
-        const w = image.bitmap.width;
-        image.crop(0, 0, w, posTop).write('crop.png');
-        await new Promise(resolve => setTimeout(resolve, 100));
-        colorPalleteTop = await getPaletteFromURL('crop.png');
-        if (colorPalleteTop.length > 1) {
-        obj.top = posTop;
-        fs.unlinkSync('crop.png');
-        break;
+    const identifyBorder = async (lado, image) => {
+        var pos = 1;
+        var colorPallete = [];
+        while (true) { // Quero colocar esse bloco em no try
+            await positionBorder(lado, pos, image);  
+            await new Promise(resolve => setTimeout(resolve, 100));
+            colorPallete = await getPaletteFromURL('crop.png');
+            if (colorPallete.length > 1) {
+                fs.unlinkSync('crop.png');
+                return pos;
+            }
+            pos = pos + 1;
+            fs.unlinkSync('crop.png');
         }
-        posTop = posTop + 1;
-        fs.unlinkSync('crop.png');
     }
 
-    // get position crop baixo
-    var posBaixo = 1;
-    var colorPalleteBaixo = [];
-    while (true) { 
-        const image = await Jimp.read(img);
-        const h = image.bitmap.height;
-        const w = image.bitmap.width;
-        image.crop(0, h - posBaixo, w, h - (h - posBaixo) ).write('crop.png');
-        await new Promise(resolve => setTimeout(resolve, 100));
-        colorPalleteBaixo = await getPaletteFromURL('crop.png');
-        if (colorPalleteBaixo.length > 1) {
-        obj.baixo = posBaixo;
-        fs.unlinkSync('crop.png');
-        break;
+    const positionBorder = async (lado, pos, image) => {
+        const img = await Jimp.read(image);
+        const h = img.bitmap.height;
+        const w = img.bitmap.width;
+        switch(lado) {
+            case "rigth": // direito
+                img.crop(0, 0, pos, h).write('crop.png'); 
+                break;
+            case "left":
+                img.crop(1, 0, pos, h).write('crop.png');
+                break;
+            case "top":
+                img.crop(0, 0, w, pos).write('crop.png');
+                break;
+            case "bottom":
+                img.crop(0, h - pos, w, h - (h - pos) ).write('crop.png');
+                break;
         }
-        posBaixo = posBaixo + 1;
-        fs.unlinkSync('crop.png');
     }
-    console.log(obj)
-    const image = await Jimp.read(img);
-    const h = image.bitmap.height;
-    const w = image.bitmap.width;
-    image.crop(0, 0, w - obj.direito, h);                                          // corta direito
-    image.crop(obj.esquerdo, 0, (w - obj.direito) - obj.esquerdo, h );             // corte esquerdo
-    image.crop(0, obj.top, (w - obj.direito) - obj.esquerdo, h);                   // corte top
-    image.crop(0, 0, (w - obj.direito) - obj.esquerdo, (h - obj.top) - obj.baixo); // corte baixo
-    image.write('result.png');
 
+    const editar = async (image, position) => {
+        const img = await Jimp.read(image);
+        const h = img.bitmap.height;
+        const w = img.bitmap.width;
+        img.crop(0, 0, w - position.rigth, h);                                                       // corta direito
+        img.crop(position.left, 0, (w - position.rigth) - position.left, h );                        // corte esquerdo
+        img.crop(0, position.top, (w - position.rigth) -  position.left, h);                         // corte topo
+        img.crop(0, 0, (w - position.rigth) -  position.left, (h - position.top) - position.bottom); // corte baixo
+        img.write('result.png');
+    }
+
+    return { 
+        start(image) {
+            return main(image);
+        }
+    };
 }
-main()
+
+async function executar() {
+    const image = 'imagem.jpg';
+    const editar = await editarImagem()
+    await editar.start(image)
+}
+executar()
