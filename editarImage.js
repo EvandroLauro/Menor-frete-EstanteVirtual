@@ -2,36 +2,45 @@ const Jimp = require('jimp');
 const { getPaletteFromURL } = require('color-thief-node');
 const fs = require('fs');
 
+// Obs: Essa função tem que retornar alguma coisa no futuro
 const editarImagem = async() => {
     
     const main = async (image) => {
-        const position = {
-            rigth: 0,
-            left: 0,
-            top: 0,
-            bottom: 0
-        }
-        // Quero colocar isso em uma promessa.all
-        position.rigth = await identifyBorder("rigth", image);  //direito
-        position.left = await identifyBorder("left", image);    //esquero 
-        position.top = await identifyBorder("top", image);      //topo
-        position.bottom = await identifyBorder("bottom", image);//fundo
-        await editar(image,position)
+        const promise = [
+            identifyBorder("rigth", image),
+            identifyBorder("left", image),
+            identifyBorder("top", image),
+            identifyBorder("bottom", image)
+        ];
+        const bordersPostionList = await Promise.all(promise).then((data) => {
+                return data;
+        });
+        const borderPositionsObj = {
+            "rigth" : bordersPostionList[0],
+            "left" : bordersPostionList[1],
+            "top" : bordersPostionList[2],
+            "bottom" : bordersPostionList[3]
+        };
+        await editar(image, borderPositionsObj);
     }
 
     const identifyBorder = async (lado, image) => {
         var pos = 1;
         var colorPallete = [];
-        while (true) { // Quero colocar esse bloco em no try
-            await positionBorder(lado, pos, image);  
-            await new Promise(resolve => setTimeout(resolve, 100));
-            colorPallete = await getPaletteFromURL('crop.png');
-            if (colorPallete.length > 1) {
-                fs.unlinkSync('crop.png');
-                return pos;
+        while (true) {
+            try {
+                const link = await positionBorder(lado, pos, image);  
+                await new Promise(resolve => setTimeout(resolve, 100));
+                colorPallete = await getPaletteFromURL(link);
+                if (colorPallete.length > 1) {
+                    fs.unlinkSync(link);
+                    return pos;
+                }
+                pos = pos + 1;
+                fs.unlinkSync(link);
+            } catch (error) {
+                await identifyBorder(lado, image);
             }
-            pos = pos + 1;
-            fs.unlinkSync('crop.png');
         }
     }
 
@@ -40,18 +49,18 @@ const editarImagem = async() => {
         const h = img.bitmap.height;
         const w = img.bitmap.width;
         switch(lado) {
-            case "rigth": // direito
-                img.crop(0, 0, pos, h).write('crop.png'); 
-                break;
+            case "rigth":
+                img.crop(0, 0, pos, h).write('cropRigth.png'); 
+                return 'cropRigth.png';
             case "left":
-                img.crop(1, 0, pos, h).write('crop.png');
-                break;
+                img.crop(1, 0, pos, h).write('cropLeft.png');
+                return 'cropLeft.png';
             case "top":
-                img.crop(0, 0, w, pos).write('crop.png');
-                break;
+                img.crop(0, 0, w, pos).write('cropTop.png');
+                return 'cropTop.png';
             case "bottom":
-                img.crop(0, h - pos, w, h - (h - pos) ).write('crop.png');
-                break;
+                img.crop(0, h - pos, w, h - (h - pos) ).write('cropBotom.png');
+                return 'cropBotom.png';
         }
     }
 
