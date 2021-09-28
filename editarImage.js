@@ -1,8 +1,8 @@
 const Jimp = require('jimp');
 const { getPaletteFromURL } = require('color-thief-node');
-const fs = require('fs');
 
 // Obs: Essa função tem que retornar alguma coisa no futuro
+
 const editarImagem = async() => {
     
     const main = async (image) => {
@@ -13,7 +13,7 @@ const editarImagem = async() => {
             identifyBorder("bottom", image)
         ];
         const bordersPostionList = await Promise.all(promise).then((data) => {
-                return data;
+            return data;
         });
         const borderPositionsObj = {
             "rigth" : bordersPostionList[0],
@@ -27,18 +27,16 @@ const editarImagem = async() => {
     const identifyBorder = async (lado, image) => {
         var pos = 1;
         var colorPallete = [];
-        while (true) {
+        while(true) {
             try {
-                const link = await positionBorder(lado, pos, image);  
-                await new Promise(resolve => setTimeout(resolve, 100));
+                const img = await positionBorder(lado, pos, image);
+                const link = await img.getBase64Async(Jimp.AUTO);
                 colorPallete = await getPaletteFromURL(link);
                 if (colorPallete.length > 1) {
-                    fs.unlinkSync(link);
                     return pos;
                 }
                 pos = pos + 1;
-                fs.unlinkSync(link);
-            } catch (error) {
+            } catch(error) {
                 await identifyBorder(lado, image);
             }
         }
@@ -50,17 +48,13 @@ const editarImagem = async() => {
         const w = img.bitmap.width;
         switch(lado) {
             case "rigth":
-                img.crop(0, 0, pos, h).write('cropRigth.png'); 
-                return 'cropRigth.png';
+                return img.crop(0, 0, pos, h);
             case "left":
-                img.crop(1, 0, pos, h).write('cropLeft.png');
-                return 'cropLeft.png';
+                return img.crop(1, 0, pos, h);
             case "top":
-                img.crop(0, 0, w, pos).write('cropTop.png');
-                return 'cropTop.png';
+                return img.crop(0, 0, w, pos);
             case "bottom":
-                img.crop(0, h - pos, w, h - (h - pos) ).write('cropBotom.png');
-                return 'cropBotom.png';
+                return img.crop(0, h - pos, w, h - (h - pos));
         }
     }
 
@@ -82,9 +76,9 @@ const editarImagem = async() => {
     };
 }
 
-async function executar() {
+async function execute() {
     const image = 'imagem.jpg';
-    const editar = await editarImagem()
-    await editar.start(image)
+    const editar = await editarImagem();
+    await editar.start(image);
 }
-executar()
+execute()
